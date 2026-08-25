@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdamXZ Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #05060f;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+        body.light-mode {
+            background: #f0f4ff;
+            color: #1a1a2e;
+        }
+        body.light-mode .container {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-mode .input-group input {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+        body.light-mode .subtitle {
+            color: #555;
+        }
+        body.light-mode .tab-btn {
+            color: #555;
+        }
+        body.light-mode .input-group label {
+            color: #555;
+        }
+        body.light-mode .splash-screen {
+            background: #f0f4ff;
+        }
+        body.light-mode .history-item {
+            border-bottom-color: rgba(0, 0, 0, 0.05);
+        }
+        body.light-mode .toast {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1a2e;
+        }
+        body.light-mode .settings-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-mode .settings-panel h3 {
+            color: #1a1a2e;
+        }
+        body.light-mode .settings-panel label {
+            color: #555;
+        }
+        .splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #05060f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .splash-screen .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #00f2fe, #4facfe, #a044ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse-glow 1.5s ease-in-out infinite, gradient-move 3s ease-in-out infinite;
+        }
+        .splash-screen .loader {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 242, 254, 0.1);
+            border-top-color: #00f2fe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .bg-particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .bg-particles span {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #00f2fe;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00f2fe;
+            animation: float-particle 15s infinite linear;
+        }
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+        .bg-particles::before, .bg-particles::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+        }
+        .bg-particles::before {
+            background: #00f2fe;
+            top: -100px;
+            left: -100px;
+            animation: float 6s infinite alternate;
+        }
+        .bg-particles::after {
+            background: #a044ff;
+            bottom: -100px;
+            right: -100px;
+            animation: float 8s infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-30px) scale(1.1); }
+        }
+        .container-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            max-height: 95vh;
+            overflow-y: auto;
+            padding: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
+        }
+        .container-wrapper::-webkit-scrollbar {
+            width: 4px;
+        }
+        .container-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .container-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.3);
+            border-radius: 10px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 25px 20px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            animation: floating-container 6s ease-in-out infinite;
+            transition: background 0.5s ease, border-color 0.5s ease;
+        }
+        @keyframes floating-container {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .video-header {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 242, 254, 0.2);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            position: relative;
+            background: transparent;
+            aspect-ratio: 16/9;
+        }
+        .video-header video {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            opacity: 0;
+            animation: videoFadeIn 0.5s ease-in-out forwards;
+            background: transparent;
+        }
+        @keyframes videoFadeIn {
+            0% { opacity: 0; transform: scale(1.01); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .title-wrapper {
+            min-height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            position: relative;
+        }
+        #typing-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe, #a044ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse-glow 3s ease-in-out infinite, gradient-move 4s ease-in-out infinite;
+            display: inline-block;
+            position: relative;
+        }
+        #typing-title::before, #typing-title::after {
+            content: 'ADAMXZ';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #00f2fe, #4facfe, #a044ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-move 4s ease-in-out infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #typing-title::before {
+            animation: glitch-1 3s infinite linear alternate-reverse;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        }
+        #typing-title::after {
+            animation: glitch-2 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+        }
+        @keyframes glitch-1 {
+            0% { transform: translate(0); opacity: 0; }
+            10% { transform: translate(-3px, 2px); opacity: 0.8; }
+            20% { transform: translate(3px, -2px); opacity: 0; }
+            100% { transform: translate(0); opacity: 0; }
+        }
+        @keyframes glitch-2 {
+            0% { transform: translate(0); opacity: 0; }
+            15% { transform: translate(4px, -3px); opacity: 0.8; }
+            25% { transform: translate(-4px, 3px); opacity: 0; }
+            100% { transform: translate(0); opacity: 0; }
+        }
+        @keyframes gradient-move {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4)); }
+            50% { filter: drop-shadow(0 0 25px rgba(160, 68, 255, 0.6)); }
+        }
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2.5rem;
+            background: #00f2fe;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.7s infinite;
+            box-shadow: 0 0 10px #00f2fe;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            transition: color 0.5s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 18px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            border-radius: 10px;
+            padding: 8px 14px;
+            flex: 1;
+            min-width: 60px;
+            transition: all 0.3s ease;
+        }
+        .stat-item:hover {
+            transform: scale(1.05);
+            border-color: #00f2fe;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.1);
+        }
+        .stat-item .number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #00f2fe;
+        }
+        .stat-item .label {
+            font-size: 0.55rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: #fff;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: #00f2fe;
+        }
+        .settings-toggle {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            color: #fff;
+        }
+        .settings-toggle:hover {
+            transform: scale(1.1);
+            border-color: #00f2fe;
+        }
+        body.light-mode .theme-toggle, body.light-mode .settings-toggle {
+            background: rgba(0, 0, 0, 0.05);
+            color: #1a1a2e;
+        }
+        .search-bar {
+            position: relative;
+            margin-bottom: 18px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 18px 12px 42px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #00f2fe;
+            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.12);
+            background: rgba(0, 242, 254, 0.04);
+        }
+        .search-bar input::placeholder {
+            color: #555;
+            font-style: italic;
+            font-weight: 300;
+        }
+        .search-bar .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: 300;
+            pointer-events: none;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 6px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: #777;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            flex: 1;
+            min-width: 65px;
+            letter-spacing: 0.3px;
+            position: relative;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.25);
+            transform: scale(1.03);
+        }
+        .tab-btn:hover:not(.active) {
+            color: #ccc;
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .input-group {
+            margin-bottom: 12px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.7rem;
+            color: #888;
+            font-weight: 500;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.82rem;
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #00f2fe;
+            box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.1);
+            background: rgba(0, 242, 254, 0.04);
+        }
+        .input-group input::placeholder {
+            color: #444;
+            font-weight: 300;
+            font-size: 0.75rem;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 11px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #000;
+            transition: all 0.3s ease;
+            margin-top: 4px;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.15);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe, #a044ff, #00f2fe);
+            background-size: 300% 300%;
+            border-radius: 11px;
+            z-index: -1;
+            animation: borderGlow 3s ease-in-out infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform: scale(0);
+        }
+        .btn-primary:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.35);
+        }
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00f2fe, #4facfe, #a044ff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10% { transform: translateX(-10px); }
+            20% { transform: translateX(10px); }
+            30% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            50% { transform: translateX(-5px); }
+            60% { transform: translateX(5px); }
+            70% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            90% { transform: translateX(-2px); }
+            100% { transform: translateX(0); }
+        }
+        .shake {
+            animation: shake 0.6s ease-in-out;
+        }
+        .result-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 14px;
+            border: 1px solid rgba(160, 68, 255, 0.25);
+            display: none;
+            max-width: 100%;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+        .result-box img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.2);
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .result-box .success-text {
+            color: #00f2fe;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .error-text {
+            color: #ff4d4d;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+        .no-result {
+            color: #555;
+            padding: 12px 0;
+            font-style: italic;
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        .history-section {
+            margin-top: 15px;
+            text-align: left;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .history-header .label {
+            font-size: 0.65rem;
+            color: #555;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .history-header .clear-btn {
+            background: transparent;
+            border: none;
+            color: #555;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            padding: 4px 8px;
+        }
+        .history-header .clear-btn:hover {
+            color: #ff4d4d;
+        }
+        .history-list {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            color: #777;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 242, 254, 0.2) transparent;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 3px;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.2);
+            border-radius: 10px;
+        }
+        .history-item {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+        }
+        .history-item .status-success {
+            color: #00f2fe;
+        }
+        .history-item .status-error {
+            color: #ff4d4d;
+        }
+        .history-empty {
+            color: #444;
+            font-style: italic;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: #fff;
+            font-size: 0.85rem;
+            z-index: 999;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none;
+            font-family: 'Poppins', sans-serif;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            border-color: #00f2fe;
+        }
+        .toast.error {
+            border-color: #ff4d4d;
+        }
+        .download-btn {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid #00f2fe;
+            border-radius: 6px;
+            color: #00f2fe;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .download-btn:hover {
+            background: rgba(0, 242, 254, 0.2);
+            transform: scale(1.05);
+        }
+        .quote-footer {
+            margin-top: 15px;
+            font-size: 0.65rem;
+            color: #444;
+            letter-spacing: 0.5px;
+            font-style: italic;
+            transition: color 0.5s ease;
+        }
+        body.light-mode .quote-footer {
+            color: #888;
+        }
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            z-index: 200;
+            min-width: 300px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+        .settings-panel h3 {
+            margin-bottom: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #fff;
+            text-align: center;
+        }
+        .settings-panel .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .settings-panel .setting-item label {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: 400;
+        }
+        .settings-panel .setting-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #00f2fe;
+            cursor: pointer;
+        }
+        .settings-panel .btn-primary {
+            margin-top: 15px;
+        }
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 199;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 10px auto;
+            border: 3px solid rgba(0, 242, 254, 0.1);
+            border-top: 3px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 18px 14px 25px; }
+            #typing-title { font-size: 2rem; }
+            .tab-btn { padding: 6px 10px; font-size: 0.7rem; min-width: 50px; }
+            .subtitle { font-size: 0.7rem; letter-spacing: 2px; }
+            .input-group label { font-size: 0.6rem; }
+            .input-group input { padding: 8px 12px; font-size: 0.75rem; }
+            .btn-primary { font-size: 0.65rem; padding: 9px; }
+            .search-bar input { padding: 10px 14px 10px 36px; font-size: 0.75rem; }
+            .cursor { height: 2rem; }
+            .stat-item .number { font-size: 1rem; }
+            .theme-toggle, .settings-toggle { width: 36px; height: 36px; font-size: 1rem; top: 10px; right: 10px; }
+            .settings-toggle { top: 55px; }
+            .splash-screen .logo { font-size: 2.5rem; }
+            .settings-panel { min-width: 280px; padding: 20px; }
+            .grid-2col { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="splash-screen" id="splash">
+        <div class="logo">ADAMXZ</div>
+        <div class="loader"></div>
+    </div>
+
+    <div class="theme-toggle" onclick="toggleTheme()" title="Ganti Tema">🌓</div>
+    <div class="settings-toggle" onclick="openSettings()" title="Pengaturan">⚙️</div>
+
+    <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <h3>Pengaturan</h3>
+        <div class="setting-item">
+            <label>Auto Download</label>
+            <input type="checkbox" id="autoDownload" checked>
+        </div>
+        <div class="setting-item">
+            <label>Sound Effects</label>
+            <input type="checkbox" id="soundEffects" checked>
+        </div>
+        <div class="setting-item">
+            <label>Dark Mode</label>
+            <input type="checkbox" id="darkMode" checked onchange="toggleTheme()">
+        </div>
+        <div class="setting-item">
+            <label>Save History</label>
+            <input type="checkbox" id="saveHistory" checked>
+        </div>
+        <button class="btn-primary" onclick="closeSettings()">Tutup</button>
+    </div>
+
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="container-wrapper">
+        <div class="container">
+
+            <div class="video-header">
+                <video id="bgVideo" autoplay muted loop playsinline preload="auto">
+                    <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+                </video>
+            </div>
+
+            <div class="title-wrapper">
+                <h1 id="typing-title"></h1>
+            </div>
+            <p class="subtitle">MASIH DALAM TAHAP PROSES'</p>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="number" id="stat-users">0</div>
+                    <div class="label">Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="stat-requests">0</div>
+                    <div class="label">Requests</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="stat-success">0%</div>
+                    <div class="label">Success</div>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <span class="search-icon">⌕</span>
+                <input type="text" id="searchInput" placeholder="Cari menu atau fitur..." oninput="searchMenu()">
+            </div>
+
+            <div class="tabs" id="tabContainer">
+                <button class="tab-btn active" data-tab="fakecall" onclick="switchTab('fakecall', this)">Fake Call</button>
+                <button class="tab-btn" data-tab="fakeff" onclick="switchTab('fakeff', this)">FF Duo</button>
+                <button class="tab-btn" data-tab="fakesolo" onclick="switchTab('fakesolo', this)">FF Solo</button>
+                <button class="tab-btn" data-tab="igstory" onclick="switchTab('igstory', this)">IG Story</button>
+                <button class="tab-btn" data-tab="qrcode" onclick="switchTab('qrcode', this)">QR Code</button>
+            </div>
+
+            <div id="fakecall" class="tab-content active">
+                <div class="input-group">
+                    <label for="ppurl">Profile Picture URL</label>
+                    <input type="text" id="ppurl" placeholder="https://contoh.com/gambar.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="name">Nama Pemanggil</label>
+                    <input type="text" id="name" placeholder="Adamxz">
+                </div>
+                <div class="input-group">
+                    <label for="duration">Durasi (detik)</label>
+                    <input type="number" id="duration" placeholder="30">
+                </div>
+                <button class="btn-primary" onclick="startFakeCall()">Mulai Panggilan</button>
+                <div class="progress-bar" id="progress-call"><div class="fill" id="fill-call"></div></div>
+                <div id="result-call" class="result-box"></div>
+            </div>
+
+            <div id="fakeff" class="tab-content">
+                <div class="grid-2col">
+                    <div class="input-group">
+                        <label for="nickname1">Nickname 1</label>
+                        <input type="text" id="nickname1" placeholder="Player 1">
+                    </div>
+                    <div class="input-group">
+                        <label for="nickname2">Nickname 2</label>
+                        <input type="text" id="nickname2" placeholder="Player 2">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="startFakeFF()">Mulai FF Duo</button>
+                <div class="progress-bar" id="progress-ff"><div class="fill" id="fill-ff"></div></div>
+                <div id="result-ff" class="result-box"></div>
+            </div>
+
+            <div id="fakesolo" class="tab-content">
+                <div class="input-group">
+                    <label for="usn">Username</label>
+                    <input type="text" id="usn" placeholder="Username FF">
+                </div>
+                <button class="btn-primary" onclick="startFakeSolo()">Mulai FF Solo</button>
+                <div class="progress-bar" id="progress-solo"><div class="fill" id="fill-solo"></div></div>
+                <div id="result-solo" class="result-box"></div>
+            </div>
+
+            <div id="igstory" class="tab-content">
+                <div class="input-group">
+                    <label for="photo">Link Foto</label>
+                    <input type="text" id="photo" placeholder="https://contoh.com/foto.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="avatar">Link Avatar</label>
+                    <input type="text" id="avatar" placeholder="https://contoh.com/avatar.jpg">
+                </div>
+                <div class="input-group">
+                    <label for="usn_ig">Username IG</label>
+                    <input type="text" id="usn_ig" placeholder="adamxz">
+                </div>
+                <div class="input-group">
+                    <label for="name_ig">Nama Tampilan</label>
+                    <input type="text" id="name_ig" placeholder="AdamXZ">
+                </div>
+                <button class="btn-primary" onclick="startIgStory()">Buat Story</button>
+                <div class="progress-bar" id="progress-ig"><div class="fill" id="fill-ig"></div></div>
+                <div id="result-ig" class="result-box"></div>
+            </div>
+
+            <div id="qrcode" class="tab-content">
+                <div class="input-group">
+                    <label>Text atau URL</label>
+                    <input type="text" id="qrText" placeholder="https://... atau text apapun">
+                </div>
+                <button class="btn-primary" onclick="generateQR()">Generate QR</button>
+                <div id="result-qr" class="result-box"></div>
+            </div>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <span class="label">Recent Activity</span>
+                    <div>
+                        <button class="clear-btn" onclick="exportHistory()">Export</button>
+                        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+                    </div>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">Belum ada aktivitas</div>
+                </div>
+            </div>
+
+            <div class="quote-footer" id="quoteFooter"></div>
+
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // SPLASH SCREEN
+        // ============================================================
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('splash').classList.add('hidden');
+            }, 1500);
+        });
+
+        // ============================================================
+        // PARTICLES
+        // ============================================================
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const span = document.createElement('span');
+            const size = Math.random() * 6 + 2;
+            span.style.width = size + 'px';
+            span.style.height = size + 'px';
+            span.style.left = Math.random() * 100 + '%';
+            span.style.animationDuration = Math.random() * 15 + 10 + 's';
+            span.style.animationDelay = Math.random() * 10 + 's';
+            particlesContainer.appendChild(span);
+        }
+
+        // ============================================================
+        // TYPING EFFECT
+        // ============================================================
+        const titleElement = document.getElementById('typing-title');
+        const text = 'ADAMXZ';
+        let index = 0;
+
+        function typeWriter() {
+            if (index < text.length) {
+                titleElement.innerHTML = text.substring(0, index + 1) + '<span class="cursor"></span>';
+                index++;
+                setTimeout(typeWriter, 150);
+            } else {
+                titleElement.innerHTML = text + '<span class="cursor"></span>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(typeWriter, 500);
+        });
+
+        // ============================================================
+        // STATISTICS
+        // ============================================================
+        function animateStats() {
+            const users = document.getElementById('stat-users');
+            const requests = document.getElementById('stat-requests');
+            const success = document.getElementById('stat-success');
+
+            let userCount = 0, reqCount = 0, successCount = 0;
+            const targetUsers = 1284, targetReqs = 3847, targetSuccess = 99;
+
+            const interval = setInterval(() => {
+                if (userCount < targetUsers) {
+                    userCount += Math.floor(Math.random() * 20) + 5;
+                    if (userCount > targetUsers) userCount = targetUsers;
+                    users.textContent = userCount.toLocaleString();
+                }
+                if (reqCount < targetReqs) {
+                    reqCount += Math.floor(Math.random() * 50) + 10;
+                    if (reqCount > targetReqs) reqCount = targetReqs;
+                    requests.textContent = reqCount.toLocaleString();
+                }
+                if (successCount < targetSuccess) {
+                    successCount += Math.floor(Math.random() * 3) + 1;
+                    if (successCount > targetSuccess) successCount = targetSuccess;
+                    success.textContent = successCount + '%';
+                }
+                if (userCount >= targetUsers && reqCount >= targetReqs && successCount >= targetSuccess) {
+                    clearInterval(interval);
+                }
+            }, 50);
+        }
+        document.addEventListener('DOMContentLoaded', animateStats);
+
+        // ============================================================
+        // THEME TOGGLE
+        // ============================================================
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.querySelector('.theme-toggle');
+            icon.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
+            const darkModeCheck = document.getElementById('darkMode');
+            if (darkModeCheck) {
+                darkModeCheck.checked = !document.body.classList.contains('light-mode');
+            }
+            showToast(document.body.classList.contains('light-mode') ? 'Mode Terang' : 'Mode Gelap', 'success');
+        }
+
+        // ============================================================
+        // TOAST NOTIFICATION
+        // ============================================================
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // ============================================================
+        // SOUND EFFECT
+        // ============================================================
+        function playClickSound() {
+            if (!document.getElementById('soundEffects').checked) return;
+            try {
+                const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            } catch (e) {}
+        }
+
+        function playNotificationSound(type = 'success') {
+            if (!document.getElementById('soundEffects').checked) return;
+            try {
+                const audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    oscillator.frequency.value = 523;
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                    setTimeout(() => {
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.frequency.value = 659;
+                        osc2.start(audioCtx.currentTime + 0.1);
+                        osc2.stop(audioCtx.currentTime + 0.2);
+                    }, 100);
+                } else {
+                    oscillator.frequency.value = 300;
+                    oscillator.type = 'sawtooth';
+                    oscillator.start(audioCtx.currentTime);
+                    oscillator.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch (e) {}
+        }
+
+        // ============================================================
+        // SHAKE
+        // ============================================================
+        function shakeElement(element) {
+            element.classList.remove('shake');
+            void element.offsetWidth;
+            element.classList.add('shake');
+            setTimeout(() => element.classList.remove('shake'), 600);
+        }
+
+        // ============================================================
+        // PROGRESS BAR
+        // ============================================================
+        function showProgress(progressId, fillId) {
+            const progress = document.getElementById(progressId);
+            const fill = document.getElementById(fillId);
+            progress.style.display = 'block';
+            let width = 0;
+            const interval = setInterval(() => {
+                width += Math.random() * 15 + 5;
+                if (width >= 100) { width = 100; clearInterval(interval); }
+                fill.style.width = width + '%';
+            }, 100);
+            return interval;
+        }
+
+        function hideProgress(progressId, interval) {
+            clearInterval(interval);
+            const progress = document.getElementById(progressId);
+            const fill = document.getElementById(progressId.replace('progress', 'fill'));
+            if (fill) fill.style.width = '100%';
+            setTimeout(() => {
+                progress.style.display = 'none';
+                if (fill) fill.style.width = '0%';
+            }, 300);
+        }
+
+        function showSpinner(resultBox) {
+            resultBox.innerHTML = '<div class="spinner"></div><span style="color:#888;">Memproses...</span>';
+            resultBox.style.display = 'block';
+        }
+
+        // ============================================================
+        // VIDEO
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('bgVideo');
+            if (video) {
+                video.loop = true;
+                video.muted = true;
+                video.playsInline = true;
+                video.preload = 'auto';
+                video.play().catch(() => {
+                    setTimeout(() => video.play(), 100);
+                });
+                video.addEventListener('ended', function(e) {
+                    e.preventDefault();
+                    this.currentTime = 0;
+                    this.play().catch(() => {});
+                });
+                video.addEventListener('pause', function() {
+                    if (!this.ended) {
+                        this.play().catch(() => {});
+                    }
+                });
+            }
+        });
+
+        // ============================================================
+        // SEARCH
+        // ============================================================
+        function searchMenu() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            const oldNoResult = document.getElementById('noResult');
+            if (oldNoResult) oldNoResult.remove();
+
+            if (keyword === '') {
+                tabs.forEach(tab => tab.style.display = '');
+                return;
+            }
+
+            let found = false;
+            tabs.forEach((tab, index) => {
+                const tabText = tab.textContent.toLowerCase();
+                const contentText = contents[index]?.textContent.toLowerCase() || '';
+                if (tabText.includes(keyword) || contentText.includes(keyword)) {
+                    tab.style.display = '';
+                    found = true;
+                } else {
+                    tab.style.display = 'none';
+                }
+            });
+
+            if (!found) {
+                const msg = document.createElement('p');
+                msg.id = 'noResult';
+                msg.className = 'no-result';
+                msg.textContent = 'Tidak ada menu yang cocok dengan "' + keyword + '"';
+                document.getElementById('tabContainer').after(msg);
+            }
+        }
+
+        // ============================================================
+        // SWITCH TAB
+        // ============================================================
+        function switchTab(tabId, btnElement) {
+            playClickSound();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.tab-btn').forEach(tab => tab.style.display = '');
+            const noResult = document.getElementById('noResult');
+            if (noResult) noResult.remove();
+        }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS (tanpa TT Stalker)
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '1') {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="fakecall"]');
+                if (btn) btn.click();
+                showToast('Shortcut: Fake Call', 'success');
+            }
+            if (e.ctrlKey && e.key === '2') {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="fakeff"]');
+                if (btn) btn.click();
+                showToast('Shortcut: FF Duo', 'success');
+            }
+            if (e.ctrlKey && e.key === '3') {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="fakesolo"]');
+                if (btn) btn.click();
+                showToast('Shortcut: FF Solo', 'success');
+            }
+            if (e.ctrlKey && e.key === '4') {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="igstory"]');
+                if (btn) btn.click();
+                showToast('Shortcut: IG Story', 'success');
+            }
+            if (e.ctrlKey && e.key === '5') {
+                e.preventDefault();
+                const btn = document.querySelector('[data-tab="qrcode"]');
+                if (btn) btn.click();
+                showToast('Shortcut: QR Code', 'success');
+            }
+            if (e.key === 'Enter' && !e.ctrlKey) {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab) {
+                    const btn = activeTab.querySelector('.btn-primary');
+                    if (btn) btn.click();
+                }
+            }
+        });
+
+        // ============================================================
+        // HISTORY
+        // ============================================================
+        function addHistory(action, status) {
+            if (!document.getElementById('saveHistory').checked) return;
+            const list = document.getElementById('historyList');
+            const empty = list.querySelector('.history-empty');
+            if (empty) empty.remove();
+
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'history-item';
+            const statusClass = status === 'Success' ? 'status-success' : 'status-error';
+            entry.innerHTML = '<span>' + action + '</span><span class="' + statusClass + '">' + status + ' ' + time + '</span>';
+            list.prepend(entry);
+            if (list.children.length > 10) list.removeChild(list.lastChild);
+        }
+
+        function clearHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '<div class="history-empty">Belum ada aktivitas</div>';
+            showToast('History cleared', 'success');
+        }
+
+        function exportHistory() {
+            const items = document.querySelectorAll('.history-item');
+            if (items.length === 0) {
+                showToast('Tidak ada history untuk diexport', 'error');
+                return;
+            }
+
+            let text = 'ADAMXZ TOOLS - HISTORY\n';
+            text += '='.repeat(40) + '\n';
+            text += 'Tanggal: ' + new Date().toLocaleString() + '\n\n';
+
+            items.forEach(item => {
+                const parts = item.textContent.trim().split(/\s+/);
+                text += parts.join(' ') + '\n';
+            });
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'history-' + Date.now() + '.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('History exported!', 'success');
+        }
+
+        // ============================================================
+        // DOWNLOAD IMAGE
+        // ============================================================
+        function downloadImage(dataUrl) {
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = 'result-' + Date.now() + '.png';
+            a.click();
+            showToast('Download dimulai!', 'success');
+        }
+
+        // ============================================================
+        // SETTINGS
+        // ============================================================
+        function openSettings() {
+            document.getElementById('settingsPanel').style.display = 'block';
+            document.getElementById('settingsOverlay').style.display = 'block';
+            playClickSound();
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPanel').style.display = 'none';
+            document.getElementById('settingsOverlay').style.display = 'none';
+        }
+
+        // ============================================================
+        // API FUNCTIONS
+        // ============================================================
+        function handleBinaryResponse(blob, resultBox, progressId, progressInterval, actionName) {
+            hideProgress(progressId, progressInterval);
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const base64data = reader.result;
+                resultBox.innerHTML = '<span class="success-text">Berhasil</span><br>' +
+                    '<img src="' + base64data + '" alt="Hasil Gambar" onclick="downloadImage(\'' + base64data + '\')">' +
+                    '<br><button class="download-btn" onclick="downloadImage(\'' + base64data + '\')">Download</button>';
+                resultBox.style.display = 'block';
+                addHistory(actionName, 'Success');
+                playNotificationSound('success');
+                showToast(actionName + ' berhasil!', 'success');
+
+                if (document.getElementById('autoDownload').checked) {
+                    setTimeout(() => downloadImage(base64data), 500);
+                }
+            };
+            reader.readAsDataURL(blob);
+        }
+
+        function handleError(resultBox, progressId, progressInterval, errorMsg, actionName) {
+            hideProgress(progressId, progressInterval);
+            resultBox.innerHTML = '<div class="error-text">Gagal: ' + errorMsg + '</div>';
+            resultBox.style.display = 'block';
+            shakeElement(resultBox);
+            addHistory(actionName, 'Failed');
+            playNotificationSound('error');
+            showToast('Gagal: ' + errorMsg, 'error');
+        }
+
+        // ============================================================
+        // FAKE CALL
+        // ============================================================
+        function startFakeCall() {
+            const ppurl = document.getElementById('ppurl').value;
+            const name = document.getElementById('name').value;
+            const duration = document.getElementById('duration').value;
+            if (!name || !duration) {
+                const resultBox = document.getElementById('result-call');
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = '<div class="error-text">Mohon isi Nama dan Durasi!</div>';
+                shakeElement(resultBox);
+                showToast('Isi semua kolom!', 'error');
+                return;
+            }
+            playClickSound();
+            const resultBox = document.getElementById('result-call');
+            showSpinner(resultBox);
+            const progressInterval = showProgress('progress-call', 'fill-call');
+            const apiUrl = 'https://apii.nexadev.my.id/fakecall?ppurl=' + encodeURIComponent(ppurl) + '&name=' + encodeURIComponent(name) + '&duration=' + duration;
+            fetch(apiUrl).then(res => {
+                if (!res.ok) throw new Error('Server Error!');
+                return res.blob();
+            }).then(blob => handleBinaryResponse(blob, resultBox, 'progress-call', progressInterval, 'Fake Call'))
+                .catch(err => handleError(resultBox, 'progress-call', progressInterval, err.message, 'Fake Call'));
+        }
+
+        // ============================================================
+        // FAKE FF DUO
+        // ============================================================
+        function startFakeFF() {
+            const n1 = document.getElementById('nickname1').value;
+            const n2 = document.getElementById('nickname2').value;
+            if (!n1 || !n2) {
+                const resultBox = document.getElementById('result-ff');
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = '<div class="error-text">Mohon isi kedua Nickname!</div>';
+                shakeElement(resultBox);
+                showToast('Isi semua kolom!', 'error');
+                return;
+            }
+            playClickSound();
+            const resultBox = document.getElementById('result-ff');
+            showSpinner(resultBox);
+            const progressInterval = showProgress('progress-ff', 'fill-ff');
+            const apiUrl = 'https://apii.nexadev.my.id/fakeffduo?nickname1=' + encodeURIComponent(n1) + '&nickname2=' + encodeURIComponent(n2);
+            fetch(apiUrl).then(res => {
+                if (!res.ok) throw new Error('Server Error!');
+                return res.blob();
+            }).then(blob => handleBinaryResponse(blob, resultBox, 'progress-ff', progressInterval, 'FF Duo'))
+                .catch(err => handleError(resultBox, 'progress-ff', progressInterval, err.message, 'FF Duo'));
+        }
+
+        // ============================================================
+        // FAKE FF SOLO
+        // ============================================================
+        function startFakeSolo() {
+            const usn = document.getElementById('usn').value;
+            if (!usn) {
+                const resultBox = document.getElementById('result-solo');
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = '<div class="error-text">Mohon isi Username FF!</div>';
+                shakeElement(resultBox);
+                showToast('Isi semua kolom!', 'error');
+                return;
+            }
+            playClickSound();
+            const resultBox = document.getElementById('result-solo');
+            showSpinner(resultBox);
+            const progressInterval = showProgress('progress-solo', 'fill-solo');
+            const apiUrl = 'https://apii.nexadev.my.id/fakeff?usn=' + encodeURIComponent(usn);
+            fetch(apiUrl).then(res => {
+                if (!res.ok) throw new Error('Server Error!');
+                return res.blob();
+            }).then(blob => handleBinaryResponse(blob, resultBox, 'progress-solo', progressInterval, 'FF Solo'))
+                .catch(err => handleError(resultBox, 'progress-solo', progressInterval, err.message, 'FF Solo'));
+        }
+
+        // ============================================================
+        // IG STORY
+        // ============================================================
+        function startIgStory() {
+            const photo = document.getElementById('photo').value;
+            const avatar = document.getElementById('avatar').value;
+            const usn_ig = document.getElementById('usn_ig').value;
+            const name_ig = document.getElementById('name_ig').value;
+            if (!photo || !avatar || !usn_ig || !name_ig) {
+                const resultBox = document.getElementById('result-ig');
+                resultBox.style.display = 'block';
+                resultBox.innerHTML = '<div class="error-text">Mohon isi semua kolom!</div>';
+                shakeElement(resultBox);
+                showToast('Isi semua kolom!', 'error');
+                return;
+            }
+            playClickSound();
+            const resultBox = document.getElementById('result-ig');
+            showSpinner(resultBox);
+            const progressInterval = showProgress('progress-ig', 'fill-ig');
+            const apiUrl = 'https://apii.nexadev.my.id/igstory-img?photo=' + encodeURIComponent(photo) + '&avatar=' + encodeURIComponent(avatar) + '&usn=' + encodeURIComponent(usn_ig) + '&name=' + encodeURIComponent(name_ig);
+            fetch(apiUrl).then(res => {
+                if (!res.ok) throw new Error('Server Error!');
+                return res.blob();
+            }).then(blob => handleBinaryResponse(blob, resultBox, 'progress-ig', progressInterval, 'IG Story'))
+                .catch(err => handleError(resultBox, 'progress-ig', progressInterval, err.message, 'IG Story'));
+        }
+
+        // ============================================================
+        // QR CODE GENERATOR
+        // ============================================================
+        function generateQR() {
+            const text = document.getElementById('qrText').value;
+            if (!text) {
+                showToast('Masukkan text/URL!', 'error');
+                return;
+            }
+            playClickSound();
+            const resultBox = document.getElementById('result-qr');
+            resultBox.style.display = 'block';
+            const apiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(text);
+            resultBox.innerHTML = '<span class="success-text">QR Code Generated</span><br>' +
+                '<img src="' + apiUrl + '" alt="QR Code" onclick="downloadImage(\'' + apiUrl + '\')">' +
+                '<br><button class="download-btn" onclick="downloadImage(\'' + apiUrl + '\')">Download QR</button>';
+            addHistory('QR Code', 'Success');
+            playNotificationSound('success');
+            showToast('QR Code berhasil!', 'success');
+        }
+
+        // ============================================================
+        // QUOTE FOOTER
+        // ============================================================
+        const quotes = [
+            "Great things never come from comfort zones.",
+            "Code like a pro, dream like a king.",
+            "Your limitation is only your imagination.",
+            "Success is not for the lazy.",
+            "AdamXZ: Built different.",
+            "The best time to start was yesterday. The next best is now.",
+            "Dream big, work hard, stay focused.",
+            "Believe you can and you're halfway there.",
+            "It does not matter how slowly you go as long as you do not stop.",
+            "The only way to do great work is to love what you do.",
+            "Innovation distinguishes between a leader and a follower.",
+            "Stay hungry, stay foolish."
+        ];
+
+        function showRandomQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteFooter').textContent = quote;
+        }
+        document.addEventListener('DOMContentLoaded', showRandomQuote);
+        setInterval(showRandomQuote, 12000);
+
+        // ============================================================
+        // AUTO INIT
+        // ============================================================
+        console.log('AdamXZ Tools loaded!');
+        console.log('Shortcuts: Ctrl+1-5 untuk switch tab');
+    </script>
+</body>
+</html>
